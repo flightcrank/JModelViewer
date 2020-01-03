@@ -2,6 +2,7 @@
 import java.util.*;
 import java.io.*;
 
+//must export with one normal per vertex (in blender turn on smooth shading, then export)
 class ObjParser {
 
 	public ArrayList<Model> model;
@@ -52,17 +53,29 @@ class ObjParser {
 				String j = s.next();		//index 2
 				String k = s.next();		//index 3
 				
-				String[] iFace = i.split("/");
-				String[] jFace = j.split("/");
-				String[] kFace = k.split("/");
-				Integer tri0 = Integer.valueOf(iFace[0]);
-				Integer tri1 = Integer.valueOf(jFace[0]);
-				Integer tri2 = Integer.valueOf(kFace[0]);
+				String[] vertIndex1 = i.split("/");
+				String[] vertIndex2 = j.split("/");
+				String[] vertIndex3 = k.split("/");
 				
-				// minus 1 to line up with the zero indexed array
-				currentModel.faces.add(tri0 - 1); 
-				currentModel.faces.add(tri1 - 1);
-				currentModel.faces.add(tri2 - 1);
+				//these values represent the Index into the vert arraylist
+				Integer vIndex0 = Integer.valueOf(vertIndex1[0]) - 1;	//(minus 1 to line up with the zero indexed array)
+				Integer vIndex1 = Integer.valueOf(vertIndex2[0]) - 1;
+				Integer vIndex2 = Integer.valueOf(vertIndex3[0]) - 1;
+				
+				// Add vertex array index to faces arraylist
+				currentModel.faces.add(vIndex0); 
+				currentModel.faces.add(vIndex1);
+				currentModel.faces.add(vIndex2);
+				
+				//these values represent the index in the normals arraylist
+				Integer nIndex0 = Integer.valueOf(vertIndex1[2]) - 1;	//(minus 1 to line up with the zero indexed array)
+				Integer nIndex1 = Integer.valueOf(vertIndex2[2]) - 1;
+				Integer nIndex2 = Integer.valueOf(vertIndex3[2]) - 1;
+				
+				//add vert index and normal index to a HashMap
+				currentModel.normalIndex.put(vIndex0, nIndex0);
+				currentModel.normalIndex.put(vIndex1, nIndex1);
+				currentModel.normalIndex.put(vIndex2, nIndex2);
 				
 			//go to the next line
 			} else {
@@ -75,10 +88,11 @@ class ObjParser {
 
 class Model {
 
-	public String name;			//object's name
-	public ArrayList<Float> verts;		//list of vertices
-	public ArrayList<Integer> faces;	//list of faces
-	public ArrayList<Float> normals;	//list of vertex normals
+	public String name;				//object's name
+	public ArrayList<Float> verts;			//list of vertices
+	public ArrayList<Float> normals;		//list of vertex normals
+	public ArrayList<Integer> faces;		//list of indices into the vertex array
+	public HashMap<Integer, Integer> normalIndex;	//list of indices into the normals array
 	
 	public Model() {
 		
@@ -86,8 +100,9 @@ class Model {
 		verts = new ArrayList<>();
 		faces = new ArrayList<>();
 		normals = new ArrayList<>();
+		normalIndex = new HashMap<>();
 	}
-
+		
 	public float[] vertsToArray() {
 		
 		int s = verts.size();
@@ -103,12 +118,32 @@ class Model {
 	
 	public float[] normalsToArray() {
 		
-		int s = normals.size();
+		int numVerts = verts.size() / 3;	
+		ArrayList<Float> n = new ArrayList<>();
+		
+		//new array list containing just the individual x,y and z normal vectors for each vertices in order
+		for (int i = 0; i < numVerts; i++) {
+
+			Integer nIndex = normalIndex.get(i);
+			
+			//normal vector direction for each axis
+			float nVecX = normals.get(nIndex);
+			float nVecY = normals.get(nIndex + 1);
+			float nVecZ = normals.get(nIndex + 2);
+			
+			n.add(nVecX);
+			n.add(nVecY);
+			n.add(nVecZ);
+			//System.out.println(nVecX + " " + nVecY + " " + nVecZ);
+		}
+		
+		int s = n.size();
 		float[] a = new float[s];
 
+		//convert arraylist to primitve array
 		for (int i = 0; i < s; i++) {
 			
-			a[i] = normals.get(i);
+			a[i] = n.get(i);
 		}
 		
 		return a;

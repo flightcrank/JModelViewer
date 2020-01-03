@@ -42,6 +42,7 @@ class Renderer implements GLEventListener {
 		rot = 0;	//set initial rotation to 0
 		
 		gl.glPointSize(5.0f);
+		gl.glEnable(GL3.GL_DEPTH_TEST);  
 		//gl.glPolygonMode(GL3.GL_FRONT_AND_BACK, GL3.GL_LINE);
 		
 		//set background colour
@@ -79,20 +80,25 @@ class Renderer implements GLEventListener {
 		
 		//use compiled shaders
 		gl.glUseProgram(renderingProgram);
-
 		
+		float light[] = {0.0f, 0.0f, -2.0f};
 		
 		//shader uniform variables
 		int rotx = gl.glGetUniformLocation(renderingProgram, "rotX");
-		gl.glUniformMatrix3fv(rotx, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot3D(rot, Matrix.X)));
+		gl.glUniformMatrix3fv(rotx, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot3D(0, Matrix.X)));
+		
 		int roty = gl.glGetUniformLocation(renderingProgram, "rotY");
 		gl.glUniformMatrix3fv(roty, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot3D(rot, Matrix.Y)));
+		
 		int modelColour = gl.glGetUniformLocation(renderingProgram, "modelColour");
 		gl.glUniform3f(modelColour, 1.0f, 0.5f, 0.31f);
-		rot += 0.02;
 		
-		float light[] = {1.2f, 1.0f, 2.0f};
+		int lightPos = gl.glGetUniformLocation(renderingProgram, "lightPosition");
+		gl.glUniform3f(lightPos, light[0], light[1], light[2]);
 		
+		//update rotation amount every frame
+		rot += 0.005;
+
 		//vert position
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);		///make vert buffer active
 		gl.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, Buffers.SIZEOF_FLOAT * 3, 0);
@@ -108,7 +114,7 @@ class Renderer implements GLEventListener {
 		
 		//set background colour and clear the screen
 		gl.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		gl.glClear(GL3.GL_COLOR_BUFFER_BIT);
+		gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 		
 		//DRAW
 		//gl.glDrawArrays(GL3.GL_TRIANGLES, 0, 3);
