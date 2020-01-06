@@ -81,7 +81,7 @@ class Renderer implements GLEventListener {
 		//use compiled shaders
 		gl.glUseProgram(renderingProgram);
 		
-		float light[] = {0.0f, 0.0f, -2.0f};
+		float light[] = {1.0f, 0.0f, -2.0f};
 		
 		//shader uniform variables
 		int rotx = gl.glGetUniformLocation(renderingProgram, "rotX");
@@ -117,8 +117,8 @@ class Renderer implements GLEventListener {
 		gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 		
 		//DRAW
-		//gl.glDrawArrays(GL3.GL_TRIANGLES, 0, 3);
-		gl.glDrawArrays(GL3.GL_POINTS, 0, numVerts);
+		//gl.glDrawArrays(GL3.GL_TRIANGLES, 0, numVerts);
+		//gl.glDrawArrays(GL3.GL_POINTS, 0, numVerts);
 		gl.glDrawElements(GL3.GL_TRIANGLES, numFaceIndex, GL3.GL_UNSIGNED_INT, 0);
 	}
 	
@@ -188,7 +188,7 @@ class Renderer implements GLEventListener {
 		
 		try {
 			
-			obj.parseFile("untitled.obj");
+			obj.parseFile("test.obj");
 			this.vertices = obj.model.get(0).vertsToArray();
 			this.normals = obj.model.get(0).normalsToArray();
 			this.faces = obj.model.get(0).facesToArray();

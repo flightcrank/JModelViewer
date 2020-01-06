@@ -38,7 +38,7 @@ public class JModelViewer extends javax.swing.JFrame {
                 GLCapabilities glcapabilities = new GLCapabilities(glprofile);
                 gLJPanel1 = new GLJPanel(glcapabilities);
                 gLJPanel1.addGLEventListener(rend);
-                FPSAnimator ani = new FPSAnimator(gLJPanel1, 30);
+                FPSAnimator ani = new FPSAnimator(gLJPanel1, 60);
                 ani.start();
 
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -48,11 +48,11 @@ public class JModelViewer extends javax.swing.JFrame {
                 gLJPanel1.setLayout(gLJPanel1Layout);
                 gLJPanel1Layout.setHorizontalGroup(
                         gLJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 400, Short.MAX_VALUE)
+                        .addGap(0, 512, Short.MAX_VALUE)
                 );
                 gLJPanel1Layout.setVerticalGroup(
                         gLJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 300, Short.MAX_VALUE)
+                        .addGap(0, 512, Short.MAX_VALUE)
                 );
 
                 getContentPane().add(gLJPanel1, java.awt.BorderLayout.CENTER);

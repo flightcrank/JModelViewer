@@ -7,13 +7,19 @@ layout (location = 1) in vec3 normal;
 uniform mat3 rotX;
 uniform mat3 rotY;
 
+out vec3 norm;
+out vec3 vertPos;
+
 void main() {
     
-    mat3 rotObj = rotX * rotY;
-    vec3 res = rotObj * vertex;
-    gl_Position = vec4(res.x, res.y, res.z, 1.0);
-    
+    mat3 rotObj = rotX * rotY;  //rotation matrix
 
-    //defualt vertex position
-    //gl_Position = vec4(vertex, 1.0);
+    vec3 newVert = rotObj * vertex; //preform rotation on vertex
+    vec3 newNorm = rotObj * normal; //preform rotation on normal
+
+    vertPos = newVert;   //send vertex normal to fragment shader
+    norm = newNorm;      //send vertex normal to fragment shader
+
+    //plot final vertex position
+    gl_Position = vec4(newVert, 1.0);
 }

@@ -33,9 +33,9 @@ class ObjParser {
 			} else if (s.hasNext("vn") && currentModel != null) {
 				
 				s.next();						//discard the 'vn' token
-				currentModel.normals.add((Float) s.nextFloat());	//x value
-				currentModel.normals.add((Float) s.nextFloat());	//y value
-				currentModel.normals.add((Float) s.nextFloat());	//z value
+				currentModel.normals.add((Float) s.nextFloat() );	//x value
+				currentModel.normals.add((Float) s.nextFloat() );	//y value
+				currentModel.normals.add((Float) s.nextFloat() );	//z value
 				
 			//if the next token in the file is the char 'o' (object name)	
 			} else if (s.hasNext("o")) {
@@ -53,30 +53,29 @@ class ObjParser {
 				String j = s.next();		//index 2
 				String k = s.next();		//index 3
 				
-				String[] vertIndex1 = i.split("/");
-				String[] vertIndex2 = j.split("/");
-				String[] vertIndex3 = k.split("/");
+				String[] faceIndex1 = i.split("/");
+				String[] faceIndex2 = j.split("/");
+				String[] faceIndex3 = k.split("/");
 				
 				//these values represent the Index into the vert arraylist
-				Integer vIndex0 = Integer.valueOf(vertIndex1[0]) - 1;	//(minus 1 to line up with the zero indexed array)
-				Integer vIndex1 = Integer.valueOf(vertIndex2[0]) - 1;
-				Integer vIndex2 = Integer.valueOf(vertIndex3[0]) - 1;
+				Integer vIndex0 = Integer.valueOf(faceIndex1[0]) - 1;	//(minus 1 to line up with the zero indexed array)
+				Integer vIndex1 = Integer.valueOf(faceIndex2[0]) - 1;
+				Integer vIndex2 = Integer.valueOf(faceIndex3[0]) - 1;
+				
+				//these values represent the Index into the normals arraylist
+				Integer nIndex0 = Integer.valueOf(faceIndex1[2]) - 1;	//(minus 1 to line up with the zero indexed array)
+				Integer nIndex1 = Integer.valueOf(faceIndex2[2]) - 1;
+				Integer nIndex2 = Integer.valueOf(faceIndex3[2]) - 1;
 				
 				// Add vertex array index to faces arraylist
 				currentModel.faces.add(vIndex0); 
 				currentModel.faces.add(vIndex1);
 				currentModel.faces.add(vIndex2);
 				
-				//these values represent the index in the normals arraylist
-				Integer nIndex0 = Integer.valueOf(vertIndex1[2]) - 1;	//(minus 1 to line up with the zero indexed array)
-				Integer nIndex1 = Integer.valueOf(vertIndex2[2]) - 1;
-				Integer nIndex2 = Integer.valueOf(vertIndex3[2]) - 1;
-				
-				//add vert index and normal index to a HashMap
 				currentModel.normalIndex.put(vIndex0, nIndex0);
 				currentModel.normalIndex.put(vIndex1, nIndex1);
 				currentModel.normalIndex.put(vIndex2, nIndex2);
-				
+							
 			//go to the next line
 			} else {
 			
@@ -118,32 +117,28 @@ class Model {
 	
 	public float[] normalsToArray() {
 		
-		int numVerts = verts.size() / 3;	
-		ArrayList<Float> n = new ArrayList<>();
-		
-		//new array list containing just the individual x,y and z normal vectors for each vertices in order
-		for (int i = 0; i < numVerts; i++) {
+		ArrayList<Float> temp = new ArrayList<>();
+		float[] a;
+		int s = normalIndex.size();
 
-			Integer nIndex = normalIndex.get(i);
-			
-			//normal vector direction for each axis
-			float nVecX = normals.get(nIndex);
-			float nVecY = normals.get(nIndex + 1);
-			float nVecZ = normals.get(nIndex + 2);
-			
-			n.add(nVecX);
-			n.add(nVecY);
-			n.add(nVecZ);
-			//System.out.println(nVecX + " " + nVecY + " " + nVecZ);
-		}
-		
-		int s = n.size();
-		float[] a = new float[s];
 
-		//convert arraylist to primitve array
 		for (int i = 0; i < s; i++) {
 			
-			a[i] = n.get(i);
+			int index = normalIndex.get(i) * 3; //3 is the span, as the normals array is 1D
+			
+			//add the 3 values that make up the normal
+			temp.add(normals.get(index));
+			temp.add(normals.get(index + 1));
+			temp.add(normals.get(index + 2));
+			
+			//System.out.println(normals.get(index) + " " + normals.get(index + 1) + " " + normals.get(index + 2));
+		}
+		
+		a = new float[temp.size()];
+		
+		for (int i = 0; i < a.length; i++) {
+			
+			a[i] = temp.get(i);			
 		}
 		
 		return a;
