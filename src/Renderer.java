@@ -1,18 +1,14 @@
 
-import com.jogamp.opengl.*;
-import com.jogamp.opengl.util.*;
-import com.jogamp.opengl.util.texture.*;
 import com.jogamp.common.nio.Buffers;
-
+import com.jogamp.opengl.*;
 import java.io.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.*;
-import java.awt.event.*;
-import java.lang.Math;
 
 class Renderer implements GLEventListener {
 	
+	OptionsPanel gui;
 	int renderingProgram;
 	int vao[] = new int[1]; //vertex attribute object
 	int vbo[] = new int[2]; //vertex buffer object
@@ -28,19 +24,24 @@ class Renderer implements GLEventListener {
 	IntBuffer fBuf;
 	ObjParser obj;
 	
+	public Renderer(OptionsPanel gui) {
+		
+		this.gui = gui;
+	}
+	
 	@Override
 	public void init(GLAutoDrawable glAutoDrawable) {
 		
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		
-		this.loadModel(obj);	
+		this.loadModel(obj);
+		
+		rot = 0;
 
 		vBuf = Buffers.newDirectFloatBuffer(vertices);
 		nBuf = Buffers.newDirectFloatBuffer(normals);
 		fBuf = Buffers.newDirectIntBuffer(faces);
-		
-		rot = 0;	//set initial rotation to 0
-		
+
 		gl.glPointSize(5.0f);
 		gl.glEnable(GL3.GL_DEPTH_TEST);  
 		//gl.glPolygonMode(GL3.GL_FRONT_AND_BACK, GL3.GL_LINE);
@@ -55,7 +56,7 @@ class Renderer implements GLEventListener {
 		gl.glGenBuffers(ebo.length, ebo, 0);	//generate the EBO buffer to hold vert ID's for faces
 		
 		//VAO
-		gl.glBindVertexArray(vao[0]);
+		gl.glBindVertexArray(vao[0]);	//make vertex attribute object 0 active 
 		
 		//verts
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);								//make vert buffer active 
@@ -81,23 +82,35 @@ class Renderer implements GLEventListener {
 		//use compiled shaders
 		gl.glUseProgram(renderingProgram);
 		
-		float light[] = {1.0f, 0.0f, -2.0f};
+		float light[] = {1.0f, 0.0f, 1.0f};
+		float np = (float) gui.nearPlaneSpinner.getValue();
+		float fp = (float) gui.farPlaneSpinner.getValue();
+		float scale = (float) gui.scaleSpinner.getValue();
+		float x = (float) gui.xSpinner.getValue();
+		float y = (float) gui.ySpinner.getValue();
+		float z = (float) gui.zSpinner.getValue();
 		
 		//shader uniform variables
 		int rotx = gl.glGetUniformLocation(renderingProgram, "rotX");
-		gl.glUniformMatrix3fv(rotx, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot3D(0, Matrix.X)));
+		gl.glUniformMatrix4fv(rotx, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot4D(rot, Matrix.X)));
 		
 		int roty = gl.glGetUniformLocation(renderingProgram, "rotY");
-		gl.glUniformMatrix3fv(roty, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot3D(rot, Matrix.Y)));
-		
-		int modelColour = gl.glGetUniformLocation(renderingProgram, "modelColour");
-		gl.glUniform3f(modelColour, 1.0f, 0.5f, 0.31f);
+		gl.glUniformMatrix4fv(roty, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot4D(rot, Matrix.Y)));
 		
 		int lightPos = gl.glGetUniformLocation(renderingProgram, "lightPosition");
 		gl.glUniform3f(lightPos, light[0], light[1], light[2]);
 		
-		//update rotation amount every frame
-		rot += 0.005;
+		int modelColour = gl.glGetUniformLocation(renderingProgram, "modelColour");
+		gl.glUniform3f(modelColour, 1.0f, 0.5f, 0.31f);
+		
+		int offset = gl.glGetUniformLocation(renderingProgram, "offset");
+		gl.glUniform3f(offset, y, x, z);
+		
+		rot += 0.01;
+		
+		//shader uniform variables
+		int persp = gl.glGetUniformLocation(renderingProgram, "perspective");
+		gl.glUniformMatrix4fv(persp, 1, false, Buffers.newDirectFloatBuffer(Matrix.perspective(scale, np, fp)));
 
 		//vert position
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);		///make vert buffer active
@@ -131,11 +144,18 @@ class Renderer implements GLEventListener {
 	@Override
 	public void reshape(GLAutoDrawable glAutoDrawable, int x, int y, int width, int height) {
 		
+		GL3 gl = glAutoDrawable.getGL().getGL3();
+		
+		//System.out.println("W = " + width + " H = " + height);
+		System.out.println();
+		
+		int panelResolution = gl.glGetUniformLocation(renderingProgram, "panelResolution");
+		gl.glUniform2f(panelResolution, glAutoDrawable.getSurfaceWidth(), glAutoDrawable.getSurfaceHeight());
 	}
 	
 	private String[] readShaderSource(String path) {
 		
-		ArrayList<String> vertexList = new  ArrayList<String>();
+		ArrayList<String> vertexList = new  ArrayList<>();
 
 		try (BufferedReader in = new BufferedReader(new FileReader(path))) {
 			

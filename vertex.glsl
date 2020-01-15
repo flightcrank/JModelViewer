@@ -1,25 +1,27 @@
-
 #version 330 core
 
-layout (location = 0) in vec3 vertex;
-layout (location = 1) in vec3 normal;
+layout (location = 0) in vec4 vertex;
+layout (location = 1) in vec4 normal;
 
-uniform mat3 rotX;
-uniform mat3 rotY;
+uniform vec3 offset;
+uniform mat4 perspective;
+uniform mat4 rotX;
+uniform mat4 rotY;
 
-out vec3 norm;
-out vec3 vertPos;
+out vec4 norm;
+out vec4 vertPos;
 
 void main() {
     
-    mat3 rotObj = rotX * rotY;  //rotation matrix
-
-    vec3 newVert = rotObj * vertex; //preform rotation on vertex
-    vec3 newNorm = rotObj * normal; //preform rotation on normal
-
-    vertPos = newVert;   //send vertex normal to fragment shader
-    norm = newNorm;      //send vertex normal to fragment shader
-
+    vec4 cameraPos = vertex * rotY;
+    vec4 n = normal * rotY;
+    cameraPos = cameraPos + vec4(offset, 0.0);
+    
+    vec4 clipPos = perspective * cameraPos;
+    
+    vertPos = clipPos;
+    norm = n;
+    
     //plot final vertex position
-    gl_Position = vec4(newVert, 1.0);
+    gl_Position = clipPos;
 }

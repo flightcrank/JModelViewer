@@ -17,12 +17,14 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class JModelViewer extends javax.swing.JFrame {
 	
-	Renderer rend = new Renderer();
+	Renderer rend;
 	
 	/**
 	 * Creates new form JModelViewer
 	 */
 	public JModelViewer() {
+		
+		
 		initComponents();
 	}
 
@@ -33,26 +35,32 @@ public class JModelViewer extends javax.swing.JFrame {
         // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
         private void initComponents() {
 
+                optionsPanel = new OptionsPanel();
                 //OpenGL panel
                 GLProfile glprofile = GLProfile.get("GL3");
                 GLCapabilities glcapabilities = new GLCapabilities(glprofile);
                 gLJPanel1 = new GLJPanel(glcapabilities);
+                rend = new Renderer(optionsPanel);
                 gLJPanel1.addGLEventListener(rend);
                 FPSAnimator ani = new FPSAnimator(gLJPanel1, 60);
                 ani.start();
 
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
                 setTitle("JModelViewer");
+                getContentPane().add(optionsPanel, java.awt.BorderLayout.EAST);
+
+                gLJPanel1.setPreferredSize(new java.awt.Dimension(512, 512));
+                gLJPanel1.setRealized(true);
 
                 javax.swing.GroupLayout gLJPanel1Layout = new javax.swing.GroupLayout(gLJPanel1);
                 gLJPanel1.setLayout(gLJPanel1Layout);
                 gLJPanel1Layout.setHorizontalGroup(
                         gLJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 512, Short.MAX_VALUE)
+                        .addGap(0, 533, Short.MAX_VALUE)
                 );
                 gLJPanel1Layout.setVerticalGroup(
                         gLJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 512, Short.MAX_VALUE)
+                        .addGap(0, 547, Short.MAX_VALUE)
                 );
 
                 getContentPane().add(gLJPanel1, java.awt.BorderLayout.CENTER);
@@ -100,5 +108,6 @@ public class JModelViewer extends javax.swing.JFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private com.jogamp.opengl.awt.GLJPanel gLJPanel1;
+        public OptionsPanel optionsPanel;
         // End of variables declaration//GEN-END:variables
 }
