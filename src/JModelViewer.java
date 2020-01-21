@@ -3,13 +3,8 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLJPanel;
 import com.jogamp.opengl.util.FPSAnimator;
-
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  *
@@ -19,12 +14,8 @@ public class JModelViewer extends javax.swing.JFrame {
 	
 	Renderer rend;
 	
-	/**
-	 * Creates new form JModelViewer
-	 */
 	public JModelViewer() {
-		
-		
+			
 		initComponents();
 	}
 
@@ -41,6 +32,7 @@ public class JModelViewer extends javax.swing.JFrame {
                 GLCapabilities glcapabilities = new GLCapabilities(glprofile);
                 gLJPanel1 = new GLJPanel(glcapabilities);
                 rend = new Renderer(optionsPanel);
+                optionsPanel.setRenderer(rend);
                 gLJPanel1.addGLEventListener(rend);
                 FPSAnimator ani = new FPSAnimator(gLJPanel1, 60);
                 ani.start();
@@ -56,11 +48,11 @@ public class JModelViewer extends javax.swing.JFrame {
                 gLJPanel1.setLayout(gLJPanel1Layout);
                 gLJPanel1Layout.setHorizontalGroup(
                         gLJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 533, Short.MAX_VALUE)
+                        .addGap(0, 484, Short.MAX_VALUE)
                 );
                 gLJPanel1Layout.setVerticalGroup(
                         gLJPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 547, Short.MAX_VALUE)
+                        .addGap(0, 516, Short.MAX_VALUE)
                 );
 
                 getContentPane().add(gLJPanel1, java.awt.BorderLayout.CENTER);
@@ -76,8 +68,9 @@ public class JModelViewer extends javax.swing.JFrame {
 		/* Set the Nimbus look and feel */
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
 		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-		 */
+		* For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+		*/
+		
 		try {
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
 				if ("Nimbus".equals(info.getName())) {
@@ -108,6 +101,6 @@ public class JModelViewer extends javax.swing.JFrame {
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private com.jogamp.opengl.awt.GLJPanel gLJPanel1;
-        public OptionsPanel optionsPanel;
+        private OptionsPanel optionsPanel;
         // End of variables declaration//GEN-END:variables
 }

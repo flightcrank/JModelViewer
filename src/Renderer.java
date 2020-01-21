@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.*;
+import javax.swing.JLabel;
 
 class Renderer implements GLEventListener {
 	
@@ -23,6 +24,7 @@ class Renderer implements GLEventListener {
 	FloatBuffer nBuf;
 	IntBuffer fBuf;
 	ObjParser obj;
+	GLAutoDrawable glAutoDrawable;
 	
 	public Renderer(OptionsPanel gui) {
 		
@@ -32,15 +34,12 @@ class Renderer implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable glAutoDrawable) {
 		
+		this.glAutoDrawable = glAutoDrawable;
+		
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		
-		this.loadModel(obj);
-		
+		this.loadModel(obj, "test.obj");
 		rot = 0;
-
-		vBuf = Buffers.newDirectFloatBuffer(vertices);
-		nBuf = Buffers.newDirectFloatBuffer(normals);
-		fBuf = Buffers.newDirectIntBuffer(faces);
 
 		gl.glPointSize(5.0f);
 		gl.glEnable(GL3.GL_DEPTH_TEST);  
@@ -58,22 +57,19 @@ class Renderer implements GLEventListener {
 		//VAO
 		gl.glBindVertexArray(vao[0]);	//make vertex attribute object 0 active 
 		
-		//verts
-		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);								//make vert buffer active 
+		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);								//make vert buffer active
 		gl.glBufferData(GL3.GL_ARRAY_BUFFER, vBuf.limit() * Buffers.SIZEOF_FLOAT, vBuf, GL3.GL_STATIC_DRAW);	//copy verts to VBO[0] 
 		
-		//normals
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[1]);								//make normal buffer active 
 		gl.glBufferData(GL3.GL_ARRAY_BUFFER, nBuf.limit() * Buffers.SIZEOF_FLOAT, nBuf, GL3.GL_STATIC_DRAW);	//copy normals to VBO[1] 
 		
-		//faces
 		gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ebo[0]);								//make faces buffer active 
 		gl.glBufferData(GL3.GL_ELEMENT_ARRAY_BUFFER, fBuf.limit() * Buffers.SIZEOF_INT, fBuf, GL3.GL_STATIC_DRAW);	//copy fance indexs to EBO[0]
 		
 		//load/compile shaders from file
 		renderingProgram = createShaders();
 	}
-
+		
 	@Override
 	public void display(GLAutoDrawable glAutoDrawable) {
 
@@ -82,13 +78,20 @@ class Renderer implements GLEventListener {
 		//use compiled shaders
 		gl.glUseProgram(renderingProgram);
 		
-		float light[] = {1.0f, 0.0f, 1.0f};
+		//camera variables
 		float np = (float) gui.nearPlaneSpinner.getValue();
 		float fp = (float) gui.farPlaneSpinner.getValue();
 		float scale = (float) gui.scaleSpinner.getValue();
-		float x = (float) gui.xSpinner.getValue();
-		float y = (float) gui.ySpinner.getValue();
-		float z = (float) gui.zSpinner.getValue();
+		
+		//object location
+		float ox = (float) gui.oxSpinner.getValue();
+		float oy = (float) gui.oySpinner.getValue();
+		float oz = (float) gui.ozSpinner.getValue();
+		
+		//light location
+		float lx = (float) gui.lxSpinner.getValue();
+		float ly = (float) gui.lySpinner.getValue();
+		float lz = (float) gui.lzSpinner.getValue();
 		
 		//shader uniform variables
 		int rotx = gl.glGetUniformLocation(renderingProgram, "rotX");
@@ -98,13 +101,13 @@ class Renderer implements GLEventListener {
 		gl.glUniformMatrix4fv(roty, 1, false, Buffers.newDirectFloatBuffer(Matrix.rot4D(rot, Matrix.Y)));
 		
 		int lightPos = gl.glGetUniformLocation(renderingProgram, "lightPosition");
-		gl.glUniform3f(lightPos, light[0], light[1], light[2]);
+		gl.glUniform3f(lightPos, lx, ly, lz);
 		
 		int modelColour = gl.glGetUniformLocation(renderingProgram, "modelColour");
 		gl.glUniform3f(modelColour, 1.0f, 0.5f, 0.31f);
 		
 		int offset = gl.glGetUniformLocation(renderingProgram, "offset");
-		gl.glUniform3f(offset, y, x, z);
+		gl.glUniform3f(offset, oy, ox, oz);
 		
 		rot += 0.01;
 		
@@ -202,18 +205,22 @@ class Renderer implements GLEventListener {
 	}
 	
 	//store in arrays, the verts and faces of the first model in the OBJ file
-	public void loadModel(ObjParser obj) {
+	public void loadModel(ObjParser obj, String name) {
 		
 		obj = new ObjParser();
 		
 		try {
 			
-			obj.parseFile("test.obj");
+			obj.parseFile(name);
 			this.vertices = obj.model.get(0).vertsToArray();
 			this.normals = obj.model.get(0).normalsToArray();
 			this.faces = obj.model.get(0).facesToArray();
 			this.numVerts = vertices.length / 3;
 			this.numFaceIndex = faces.length;
+			
+			this.vBuf = Buffers.newDirectFloatBuffer(vertices);
+			this.nBuf = Buffers.newDirectFloatBuffer(normals);
+			this.fBuf = Buffers.newDirectIntBuffer(faces);
 			
 		} catch (Exception ex) {
 			

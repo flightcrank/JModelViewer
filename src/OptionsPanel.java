@@ -1,8 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 
 /**
  *
@@ -10,11 +9,17 @@
  */
 public class OptionsPanel extends javax.swing.JPanel {
 
-	/**
-	 * Creates new form OptionsPanel
-	 */
+	Renderer rend;
+	
+	//public ObjParser obj;
 	public OptionsPanel() {
+
 		initComponents();
+	}
+	
+	public void setRenderer(Renderer rend) {
+		
+		this.rend = rend;
 	}
 
 	/**
@@ -25,12 +30,13 @@ public class OptionsPanel extends javax.swing.JPanel {
         private void initComponents() {
                 java.awt.GridBagConstraints gridBagConstraints;
 
+                jFileChooser1 = new javax.swing.JFileChooser();
                 objectOffsetPanel = new javax.swing.JPanel();
-                xSpinner = new javax.swing.JSpinner();
+                oxSpinner = new javax.swing.JSpinner();
                 jLabel2 = new javax.swing.JLabel();
-                ySpinner = new javax.swing.JSpinner();
+                oySpinner = new javax.swing.JSpinner();
                 jLabel3 = new javax.swing.JLabel();
-                zSpinner = new javax.swing.JSpinner();
+                ozSpinner = new javax.swing.JSpinner();
                 jLabel4 = new javax.swing.JLabel();
                 cameraPanel = new javax.swing.JPanel();
                 jLabel5 = new javax.swing.JLabel();
@@ -41,11 +47,12 @@ public class OptionsPanel extends javax.swing.JPanel {
                 scaleSpinner = new javax.swing.JSpinner();
                 jPanel1 = new javax.swing.JPanel();
                 jLabel7 = new javax.swing.JLabel();
-                jSpinner1 = new javax.swing.JSpinner();
+                lxSpinner = new javax.swing.JSpinner();
                 jLabel8 = new javax.swing.JLabel();
-                jSpinner2 = new javax.swing.JSpinner();
+                lySpinner = new javax.swing.JSpinner();
                 jLabel9 = new javax.swing.JLabel();
-                jSpinner3 = new javax.swing.JSpinner();
+                lzSpinner = new javax.swing.JSpinner();
+                jButton1 = new javax.swing.JButton();
 
                 setLayout(new java.awt.GridBagLayout());
 
@@ -53,14 +60,14 @@ public class OptionsPanel extends javax.swing.JPanel {
                 objectOffsetPanel.setName("ObjecOffsetPanel"); // NOI18N
                 objectOffsetPanel.setLayout(new java.awt.GridBagLayout());
 
-                xSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0f, null, null, 1.0f));
-                xSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(xSpinner, ""));
+                oxSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0f, null, null, 1.0f));
+                oxSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(oxSpinner, ""));
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 2;
                 gridBagConstraints.gridy = 2;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-                objectOffsetPanel.add(xSpinner, gridBagConstraints);
+                objectOffsetPanel.add(oxSpinner, gridBagConstraints);
 
                 jLabel2.setText("Y");
                 gridBagConstraints = new java.awt.GridBagConstraints();
@@ -69,14 +76,14 @@ public class OptionsPanel extends javax.swing.JPanel {
                 gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 15);
                 objectOffsetPanel.add(jLabel2, gridBagConstraints);
 
-                ySpinner.setModel(new javax.swing.SpinnerNumberModel(0.0f, null, null, 1.0f));
-                ySpinner.setEditor(new javax.swing.JSpinner.NumberEditor(ySpinner, ""));
+                oySpinner.setModel(new javax.swing.SpinnerNumberModel(0.0f, null, null, 1.0f));
+                oySpinner.setEditor(new javax.swing.JSpinner.NumberEditor(oySpinner, ""));
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 2;
                 gridBagConstraints.gridy = 3;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-                objectOffsetPanel.add(ySpinner, gridBagConstraints);
+                objectOffsetPanel.add(oySpinner, gridBagConstraints);
 
                 jLabel3.setText("Z");
                 gridBagConstraints = new java.awt.GridBagConstraints();
@@ -85,15 +92,15 @@ public class OptionsPanel extends javax.swing.JPanel {
                 gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 15);
                 objectOffsetPanel.add(jLabel3, gridBagConstraints);
 
-                zSpinner.setModel(new javax.swing.SpinnerNumberModel(-2.0f, null, null, 1.0f));
-                zSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(zSpinner, ""));
+                ozSpinner.setModel(new javax.swing.SpinnerNumberModel(-2.0f, null, null, 1.0f));
+                ozSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(ozSpinner, ""));
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 2;
                 gridBagConstraints.gridy = 4;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-                objectOffsetPanel.add(zSpinner, gridBagConstraints);
+                objectOffsetPanel.add(ozSpinner, gridBagConstraints);
 
                 jLabel4.setText("X");
                 gridBagConstraints = new java.awt.GridBagConstraints();
@@ -104,7 +111,7 @@ public class OptionsPanel extends javax.swing.JPanel {
 
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = 1;
+                gridBagConstraints.gridy = 2;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
                 add(objectOffsetPanel, gridBagConstraints);
@@ -168,7 +175,7 @@ public class OptionsPanel extends javax.swing.JPanel {
 
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = 3;
+                gridBagConstraints.gridy = 4;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
                 gridBagConstraints.weightx = 1.0;
@@ -187,13 +194,13 @@ public class OptionsPanel extends javax.swing.JPanel {
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 15);
                 jPanel1.add(jLabel7, gridBagConstraints);
 
-                jSpinner1.setModel(new javax.swing.SpinnerNumberModel(0, null, null, 0));
+                lxSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0f, null, null, 0.1f));
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 2;
                 gridBagConstraints.gridy = 1;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-                jPanel1.add(jSpinner1, gridBagConstraints);
+                jPanel1.add(lxSpinner, gridBagConstraints);
 
                 jLabel8.setText("Y");
                 gridBagConstraints = new java.awt.GridBagConstraints();
@@ -202,13 +209,13 @@ public class OptionsPanel extends javax.swing.JPanel {
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 15);
                 jPanel1.add(jLabel8, gridBagConstraints);
 
-                jSpinner2.setModel(new javax.swing.SpinnerNumberModel(0, null, null, 0));
+                lySpinner.setModel(new javax.swing.SpinnerNumberModel(0.0f, null, null, 0.1f));
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 2;
                 gridBagConstraints.gridy = 2;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-                jPanel1.add(jSpinner2, gridBagConstraints);
+                jPanel1.add(lySpinner, gridBagConstraints);
 
                 jLabel9.setText("Z");
                 gridBagConstraints = new java.awt.GridBagConstraints();
@@ -217,28 +224,55 @@ public class OptionsPanel extends javax.swing.JPanel {
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 15);
                 jPanel1.add(jLabel9, gridBagConstraints);
 
-                jSpinner3.setModel(new javax.swing.SpinnerNumberModel(2, null, null, 0));
+                lzSpinner.setModel(new javax.swing.SpinnerNumberModel(2.0f, null, null, 0.1f));
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 2;
                 gridBagConstraints.gridy = 3;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-                jPanel1.add(jSpinner3, gridBagConstraints);
+                jPanel1.add(lzSpinner, gridBagConstraints);
 
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 1;
-                gridBagConstraints.gridy = 2;
+                gridBagConstraints.gridy = 3;
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
                 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
                 add(jPanel1, gridBagConstraints);
+
+                jButton1.setText("Load Model");
+                jButton1.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton1ActionPerformed(evt);
+                        }
+                });
+                gridBagConstraints = new java.awt.GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = 1;
+                gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+                add(jButton1, gridBagConstraints);
         }// </editor-fold>//GEN-END:initComponents
+
+        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+		
+		//System.out.println("Load Model");
+		int val = jFileChooser1.showOpenDialog(this);
+		
+		if (val == JFileChooser.APPROVE_OPTION) {
+			
+			File f = jFileChooser1.getSelectedFile();
+			String fName = f.getName();
+		}
+		
+        }//GEN-LAST:event_jButton1ActionPerformed
 
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JPanel cameraPanel;
         public javax.swing.JSpinner farPlaneSpinner;
+        private javax.swing.JButton jButton1;
+        private javax.swing.JFileChooser jFileChooser1;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JLabel jLabel3;
@@ -249,14 +283,14 @@ public class OptionsPanel extends javax.swing.JPanel {
         private javax.swing.JLabel jLabel8;
         private javax.swing.JLabel jLabel9;
         private javax.swing.JPanel jPanel1;
-        private javax.swing.JSpinner jSpinner1;
-        private javax.swing.JSpinner jSpinner2;
-        private javax.swing.JSpinner jSpinner3;
+        public javax.swing.JSpinner lxSpinner;
+        public javax.swing.JSpinner lySpinner;
+        public javax.swing.JSpinner lzSpinner;
         public javax.swing.JSpinner nearPlaneSpinner;
         private javax.swing.JPanel objectOffsetPanel;
+        public javax.swing.JSpinner oxSpinner;
+        public javax.swing.JSpinner oySpinner;
+        public javax.swing.JSpinner ozSpinner;
         public javax.swing.JSpinner scaleSpinner;
-        public javax.swing.JSpinner xSpinner;
-        public javax.swing.JSpinner ySpinner;
-        public javax.swing.JSpinner zSpinner;
         // End of variables declaration//GEN-END:variables
 }

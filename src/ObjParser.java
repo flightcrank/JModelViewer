@@ -6,6 +6,7 @@ import java.io.*;
 class ObjParser {
 
 	public ArrayList<Model> model;
+	String materialFileName;
 
 	public ObjParser() {
 	
@@ -33,17 +34,28 @@ class ObjParser {
 			} else if (s.hasNext("vn") && currentModel != null) {
 				
 				s.next();						//discard the 'vn' token
-				currentModel.normals.add((Float) s.nextFloat() );	//x value
-				currentModel.normals.add((Float) s.nextFloat() );	//y value
-				currentModel.normals.add((Float) s.nextFloat() );	//z value
+				currentModel.normals.add((Float) s.nextFloat());	//x value
+				currentModel.normals.add((Float) s.nextFloat());	//y value
+				currentModel.normals.add((Float) s.nextFloat());	//z value
+				
+			} else if (s.hasNext("vt") && currentModel != null) {
+				
+				s.next();						//discard the 'vt' token
+				currentModel.uvs.add((Float) s.nextFloat());		//u value
+				currentModel.uvs.add((Float) s.nextFloat());		//v value
 				
 			//if the next token in the file is the char 'o' (object name)	
 			} else if (s.hasNext("o")) {
 				
-				s.next();			//discard the 'o' token
-				currentModel = new Model();	//clear the current model incase theres another one in the obj file
+				s.next();				//discard the 'o' token
+				currentModel = new Model();		//clear the current model incase theres another one in the obj file
 				currentModel.name = s.next();
-				model.add(currentModel);	//add current model to the list
+				model.add(currentModel);		//add current model to the list
+				
+				MtlParser mtl = new MtlParser();	//store all the materials
+				mtl.parseFile(materialFileName);
+				
+				currentModel.materials = mtl.materials;
 			
 			//OBJ file must store face information in n/n/n format, where n is a number.
 			} else if (s.hasNext("f") && currentModel != null) {
@@ -75,7 +87,12 @@ class ObjParser {
 				currentModel.normalIndex.put(vIndex0, nIndex0);
 				currentModel.normalIndex.put(vIndex1, nIndex1);
 				currentModel.normalIndex.put(vIndex2, nIndex2);
-							
+				
+			} else if (s.hasNext("mtllib")) {	
+				
+				s.next();			//discard the 'mtllib' token
+				materialFileName = s.next();
+		
 			//go to the next line
 			} else {
 			
@@ -89,9 +106,11 @@ class Model {
 
 	public String name;				//object's name
 	public ArrayList<Float> verts;			//list of vertices
-	public ArrayList<Float> normals;		//list of vertex normals
+	public ArrayList<Float> normals;		//list of normals
+	public ArrayList<Float> uvs;			//list of texture uvs
 	public ArrayList<Integer> faces;		//list of indices into the vertex array
 	public HashMap<Integer, Integer> normalIndex;	//list of indices into the normals array
+	public HashMap<String, Materal> materials;		//list of materials
 	
 	public Model() {
 		
@@ -99,6 +118,7 @@ class Model {
 		verts = new ArrayList<>();
 		faces = new ArrayList<>();
 		normals = new ArrayList<>();
+		uvs = new ArrayList<>();
 		normalIndex = new HashMap<>();
 	}
 		
@@ -121,7 +141,6 @@ class Model {
 		float[] a;
 		int s = normalIndex.size();
 
-
 		for (int i = 0; i < s; i++) {
 			
 			int index = normalIndex.get(i) * 3; //3 is the span, as the normals array is 1D
@@ -130,8 +149,6 @@ class Model {
 			temp.add(normals.get(index));
 			temp.add(normals.get(index + 1));
 			temp.add(normals.get(index + 2));
-			
-			//System.out.println(normals.get(index) + " " + normals.get(index + 1) + " " + normals.get(index + 2));
 		}
 		
 		a = new float[temp.size()];
@@ -157,4 +174,3 @@ class Model {
 		return a;
 	}
 }
-

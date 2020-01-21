@@ -63,6 +63,7 @@ class Matrix {
 
 		return  m;
 	}
+	
 	public static float[] rot4D(float angle, int axis) {
 		
 		float[] m = {
@@ -133,9 +134,9 @@ class Matrix {
 		
 		m[0] = scale;
 		m[5] = scale;
-		m[10] = (zFar + zNear) / (zNear - zFar);
-		m[14] = (2 * zFar * zNear) / (zNear - zFar);
+		m[10] = -zFar  / (zFar - zNear);
 		m[11] = -1;
+		m[14] = -zFar * zNear / (zFar - zNear);
 		
 		return m;
 	}
