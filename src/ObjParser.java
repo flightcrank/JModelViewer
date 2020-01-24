@@ -74,6 +74,11 @@ class ObjParser {
 				Integer vIndex1 = Integer.valueOf(faceIndex2[0]) - 1;
 				Integer vIndex2 = Integer.valueOf(faceIndex3[0]) - 1;
 				
+				//these values represent the Index into the UV arraylist
+				Integer uvIndex0 = Integer.valueOf(faceIndex1[1]) - 1;	//(minus 1 to line up with the zero indexed array)
+				Integer uvIndex1 = Integer.valueOf(faceIndex2[1]) - 1;
+				Integer uvIndex2 = Integer.valueOf(faceIndex3[1]) - 1;
+				
 				//these values represent the Index into the normals arraylist
 				Integer nIndex0 = Integer.valueOf(faceIndex1[2]) - 1;	//(minus 1 to line up with the zero indexed array)
 				Integer nIndex1 = Integer.valueOf(faceIndex2[2]) - 1;
@@ -84,9 +89,15 @@ class ObjParser {
 				currentModel.faces.add(vIndex1);
 				currentModel.faces.add(vIndex2);
 				
+				//Add the normal index into a HashMap so each vert is associated with the correct normal value
 				currentModel.normalIndex.put(vIndex0, nIndex0);
 				currentModel.normalIndex.put(vIndex1, nIndex1);
 				currentModel.normalIndex.put(vIndex2, nIndex2);
+				
+				//Add the uv index into a HashMap so each vert is associated with the correct uv value
+				currentModel.uvIndex.put(vIndex0, uvIndex0);
+				currentModel.uvIndex.put(vIndex1, uvIndex1);
+				currentModel.uvIndex.put(vIndex2, uvIndex2);
 				
 			} else if (s.hasNext("mtllib")) {	
 				
@@ -110,7 +121,8 @@ class Model {
 	public ArrayList<Float> uvs;			//list of texture uvs
 	public ArrayList<Integer> faces;		//list of indices into the vertex array
 	public HashMap<Integer, Integer> normalIndex;	//list of indices into the normals array
-	public HashMap<String, Materal> materials;		//list of materials
+	public HashMap<Integer, Integer> uvIndex;	//list of indices into the uv array
+	public ArrayList<Materal> materials;		//list of materials
 	
 	public Model() {
 		
@@ -120,6 +132,7 @@ class Model {
 		normals = new ArrayList<>();
 		uvs = new ArrayList<>();
 		normalIndex = new HashMap<>();
+		uvIndex = new HashMap<>();
 	}
 		
 	public float[] vertsToArray() {
@@ -149,6 +162,32 @@ class Model {
 			temp.add(normals.get(index));
 			temp.add(normals.get(index + 1));
 			temp.add(normals.get(index + 2));
+		}
+		
+		a = new float[temp.size()];
+		
+		for (int i = 0; i < a.length; i++) {
+			
+			a[i] = temp.get(i);			
+		}
+		
+		return a;
+	}
+	
+	//untested
+	public float[] uvsToArray() {
+		
+		ArrayList<Float> temp = new ArrayList<>();
+		float[] a;
+		int s = uvIndex.size();
+
+		for (int i = 0; i < s; i++) {
+			
+			int index = uvIndex.get(i) * 2; //2 is the span, as the normals array is 1D
+			
+			//add the 3 values that make up the normal
+			temp.add(uvs.get(index));
+			temp.add(uvs.get(index + 1));
 		}
 		
 		a = new float[temp.size()];

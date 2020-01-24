@@ -13,8 +13,8 @@ out vec4 vertPos;
 
 void main() {
     
-    vec4 cameraPos = vertex * rotY;
-    vec4 n = normal * rotY;
+    vec4 cameraPos = vertex * rotY * rotX;
+    vec4 n = normal * rotY * rotX;
     cameraPos = cameraPos + vec4(offset, 0.0);
     
     vec4 clipPos = perspective * cameraPos;

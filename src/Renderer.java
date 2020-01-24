@@ -1,29 +1,32 @@
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.*;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureIO;
 import java.io.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.*;
-import javax.swing.JLabel;
 
 class Renderer implements GLEventListener {
 	
 	OptionsPanel gui;
 	int renderingProgram;
 	int vao[] = new int[1]; //vertex attribute object
-	int vbo[] = new int[2]; //vertex buffer object
+	int vbo[] = new int[3]; //vertex buffer object
 	int ebo[] = new int[1]; //element buffer object
+	int texo; 		//texture buffer object
 	float vertices[];
 	float normals[];
+	float uvs[];
 	int faces[];
 	int numVerts = 0;
 	int numFaceIndex = 0;
 	float rot;
 	FloatBuffer vBuf;
 	FloatBuffer nBuf;
+	FloatBuffer tBuf;
 	IntBuffer fBuf;
-	ObjParser obj;
 	GLAutoDrawable glAutoDrawable;
 	
 	public Renderer(OptionsPanel gui) {
@@ -38,8 +41,24 @@ class Renderer implements GLEventListener {
 		
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		
-		this.loadModel(obj, "test.obj");
+		//loadModel("test.obj");
+		this.loadMesh("untitled.ply");
+		
 		rot = 0;
+		
+		Texture tex = null;
+
+		try {
+
+			tex = TextureIO.newTexture(new File("TexMap.png"), false);
+			texo = tex.getTextureObject();
+		
+		} catch (Exception e) { 
+			
+			e.printStackTrace(); 
+		}
+		
+		
 
 		gl.glPointSize(5.0f);
 		gl.glEnable(GL3.GL_DEPTH_TEST);  
@@ -51,7 +70,7 @@ class Renderer implements GLEventListener {
 		
 		//generate OPENGL buffers
 		gl.glGenVertexArrays(vao.length, vao, 0);
-		gl.glGenBuffers(vbo.length, vbo, 0);	//generate vertex AND normal buffer
+		gl.glGenBuffers(vbo.length, vbo, 0);	//generate vertex AND normal buffer AND texture buffer
 		gl.glGenBuffers(ebo.length, ebo, 0);	//generate the EBO buffer to hold vert ID's for faces
 		
 		//VAO
@@ -62,6 +81,9 @@ class Renderer implements GLEventListener {
 		
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[1]);								//make normal buffer active 
 		gl.glBufferData(GL3.GL_ARRAY_BUFFER, nBuf.limit() * Buffers.SIZEOF_FLOAT, nBuf, GL3.GL_STATIC_DRAW);	//copy normals to VBO[1] 
+		
+//		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[2]);								//make tex buffer active 
+//		gl.glBufferData(GL3.GL_ARRAY_BUFFER, tBuf.limit() * Buffers.SIZEOF_FLOAT, tBuf, GL3.GL_STATIC_DRAW);	//copy normals to VBO[2] 
 		
 		gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ebo[0]);								//make faces buffer active 
 		gl.glBufferData(GL3.GL_ELEMENT_ARRAY_BUFFER, fBuf.limit() * Buffers.SIZEOF_INT, fBuf, GL3.GL_STATIC_DRAW);	//copy fance indexs to EBO[0]
@@ -104,8 +126,8 @@ class Renderer implements GLEventListener {
 		gl.glUniform3f(lightPos, lx, ly, lz);
 		
 		int modelColour = gl.glGetUniformLocation(renderingProgram, "modelColour");
-		gl.glUniform3f(modelColour, 1.0f, 0.5f, 0.31f);
-		
+		gl.glUniform3f(modelColour, 0.8f, 0.8f, 0.8f);
+
 		int offset = gl.glGetUniformLocation(renderingProgram, "offset");
 		gl.glUniform3f(offset, oy, ox, oz);
 		
@@ -124,6 +146,15 @@ class Renderer implements GLEventListener {
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[1]);		//make normal buffer active
 		gl.glVertexAttribPointer(1, 3, GL3.GL_FLOAT, false, Buffers.SIZEOF_FLOAT * 3, 0);
 		gl.glEnableVertexAttribArray(1);
+		
+//		// activate texture unit #0 and bind it to the brick texture object
+//		gl.glActiveTexture(GL3.GL_TEXTURE0);
+//		gl.glBindTexture(GL3.GL_TEXTURE_2D, texo);
+		
+//		//tex position
+//		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[2]);		//make normal buffer active
+//		gl.glVertexAttribPointer(2, 2, GL3.GL_FLOAT, false, Buffers.SIZEOF_FLOAT * 2, 0);
+//		gl.glEnableVertexAttribArray(2);
 		
 		//faces
 		gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ebo[0]);	//make face buffer active
@@ -149,8 +180,7 @@ class Renderer implements GLEventListener {
 		
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		
-		//System.out.println("W = " + width + " H = " + height);
-		System.out.println();
+		System.out.println("W = " + width + " H = " + height);
 		
 		int panelResolution = gl.glGetUniformLocation(renderingProgram, "panelResolution");
 		gl.glUniform2f(panelResolution, glAutoDrawable.getSurfaceWidth(), glAutoDrawable.getSurfaceHeight());
@@ -204,10 +234,34 @@ class Renderer implements GLEventListener {
 		return vfprogram;
 	}
 	
-	//store in arrays, the verts and faces of the first model in the OBJ file
-	public void loadModel(ObjParser obj, String name) {
+	public void loadMesh(String fileName) {
 		
-		obj = new ObjParser();
+		PlyParser object = new PlyParser();
+		
+		try {
+			
+			object.parseFile(fileName);
+			this.vertices = object.getVertArray();
+			this.normals = object.getNormArray();
+			this.faces = object.getFacesArray();
+			this.numVerts = object.numElements("vertex");
+			this.numFaceIndex = this.faces.length;
+			
+			this.vBuf = Buffers.newDirectFloatBuffer(vertices);
+			this.nBuf = Buffers.newDirectFloatBuffer(normals);
+			this.fBuf = Buffers.newDirectIntBuffer(faces);
+		
+		} catch (Exception ex) {
+			
+			System.err.println("Could not load PLY file");
+			ex.printStackTrace();
+		}		
+	}
+	
+	//store in arrays, the verts and faces of the first model in the OBJ file
+	public ObjParser loadModel(String name) {
+		
+		ObjParser obj = new ObjParser();
 		
 		try {
 			
@@ -215,16 +269,20 @@ class Renderer implements GLEventListener {
 			this.vertices = obj.model.get(0).vertsToArray();
 			this.normals = obj.model.get(0).normalsToArray();
 			this.faces = obj.model.get(0).facesToArray();
+			this.uvs = obj.model.get(0).uvsToArray();
 			this.numVerts = vertices.length / 3;
 			this.numFaceIndex = faces.length;
 			
 			this.vBuf = Buffers.newDirectFloatBuffer(vertices);
 			this.nBuf = Buffers.newDirectFloatBuffer(normals);
+			this.tBuf = Buffers.newDirectFloatBuffer(uvs);
 			this.fBuf = Buffers.newDirectIntBuffer(faces);
 			
 		} catch (Exception ex) {
 			
 			System.err.println("Could not load OBJ file.");
 		}
+		
+		return obj;
 	}
 }

@@ -1,6 +1,7 @@
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -29,11 +30,11 @@ class Materal {
 
 class MtlParser {
 	
-	HashMap<String, Materal> materials;
+	ArrayList<Materal> materials;
 	
 	public MtlParser() {
 		
-		materials = new HashMap<>();
+		materials = new ArrayList<>();
 	}
 	
 	public void parseFile(String fileName) throws Exception {
@@ -50,7 +51,7 @@ class MtlParser {
 				currentMaterial = new Materal();
 				s.next();						//discard the 'newmtl' token
 				currentMaterial.name = s.next();
-				materials.put(currentMaterial.name, currentMaterial);	//add material to the list of materials
+				materials.add(currentMaterial);	//add material to the list of materials
 				
 			} else if (s.hasNext("Ns") && currentMaterial != null) { 
 				
