@@ -9,8 +9,6 @@ import java.util.Scanner;
  * @author karma
  */
 
-
-
 enum Token {
 	
 	ELEMENT,
@@ -83,6 +81,12 @@ public class PlyParser {
 		return 0;
 	}
 	
+	/**
+	 * testing
+	 * 
+	 * @param the property name that you want to know the type of
+	 * @return a Token enum value of the type the property refers to eg a FLOAT if the property consists of "property float x"
+	 */
 	public Token getPropertyType(String propertyName) {
 		
 		for (PlyToken val: header) {
@@ -103,6 +107,13 @@ public class PlyParser {
 		return null;
 	}
 	
+	/**
+	 *
+	 * @param  properyName: the propery name of the property you are searching for
+	 * @param elementName: the element name that the property is found under
+	 * @return the int position of where that property occurs in a data string fond in the data member variable array list.
+	 * or -1 if no property found
+	 */
 	public int propertyPosition(String properyName, String elementName) {
 		
 		int index = -1;
@@ -207,6 +218,33 @@ public class PlyParser {
 			j += 3;
 		}
 
+		return a;
+	}
+	
+	public float[] getUVArray() {
+		
+		int u = propertyPosition("s", "vertex");
+		int v = propertyPosition("t", "vertex");
+		
+		int num = this.numElements("vertex");
+		float[] a = null;
+		
+		//if UV data is found
+		if (u > 0 && v > 0) {
+			
+			a = new float[num * 2]; //2 UV values per vertex
+			int j = 0;
+			
+			for (int i = 0; i < num; i++) {
+
+				String s = data.get(i);
+	
+				a[j] = Float.valueOf(s.split(" ")[u]);
+				a[j + 1] = Float.valueOf(s.split(" ")[v]);
+				j += 2;
+			}
+		}
+		
 		return a;
 	}
 	

@@ -42,7 +42,7 @@ class Renderer implements GLEventListener {
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		
 		//loadModel("test.obj");
-		this.loadMesh("untitled.ply");
+		this.loadMesh("mario.ply");
 		
 		rot = 0;
 		
@@ -50,7 +50,7 @@ class Renderer implements GLEventListener {
 
 		try {
 
-			tex = TextureIO.newTexture(new File("TexMap.png"), false);
+			tex = TextureIO.newTexture(new File("dr.mario_di.png"), false);
 			texo = tex.getTextureObject();
 		
 		} catch (Exception e) { 
@@ -58,8 +58,6 @@ class Renderer implements GLEventListener {
 			e.printStackTrace(); 
 		}
 		
-		
-
 		gl.glPointSize(5.0f);
 		gl.glEnable(GL3.GL_DEPTH_TEST);  
 		//gl.glPolygonMode(GL3.GL_FRONT_AND_BACK, GL3.GL_LINE);
@@ -82,8 +80,8 @@ class Renderer implements GLEventListener {
 		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[1]);								//make normal buffer active 
 		gl.glBufferData(GL3.GL_ARRAY_BUFFER, nBuf.limit() * Buffers.SIZEOF_FLOAT, nBuf, GL3.GL_STATIC_DRAW);	//copy normals to VBO[1] 
 		
-//		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[2]);								//make tex buffer active 
-//		gl.glBufferData(GL3.GL_ARRAY_BUFFER, tBuf.limit() * Buffers.SIZEOF_FLOAT, tBuf, GL3.GL_STATIC_DRAW);	//copy normals to VBO[2] 
+		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[2]);								//make tex buffer active 
+		gl.glBufferData(GL3.GL_ARRAY_BUFFER, tBuf.limit() * Buffers.SIZEOF_FLOAT, tBuf, GL3.GL_STATIC_DRAW);	//copy normals to VBO[2] 
 		
 		gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ebo[0]);								//make faces buffer active 
 		gl.glBufferData(GL3.GL_ELEMENT_ARRAY_BUFFER, fBuf.limit() * Buffers.SIZEOF_INT, fBuf, GL3.GL_STATIC_DRAW);	//copy fance indexs to EBO[0]
@@ -148,13 +146,13 @@ class Renderer implements GLEventListener {
 		gl.glEnableVertexAttribArray(1);
 		
 //		// activate texture unit #0 and bind it to the brick texture object
-//		gl.glActiveTexture(GL3.GL_TEXTURE0);
-//		gl.glBindTexture(GL3.GL_TEXTURE_2D, texo);
+		gl.glActiveTexture(GL3.GL_TEXTURE0);
+		gl.glBindTexture(GL3.GL_TEXTURE_2D, texo);
 		
 //		//tex position
-//		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[2]);		//make normal buffer active
-//		gl.glVertexAttribPointer(2, 2, GL3.GL_FLOAT, false, Buffers.SIZEOF_FLOAT * 2, 0);
-//		gl.glEnableVertexAttribArray(2);
+		gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[2]);		//make normal buffer active
+		gl.glVertexAttribPointer(2, 2, GL3.GL_FLOAT, false, Buffers.SIZEOF_FLOAT * 2, 0);
+		gl.glEnableVertexAttribArray(2);
 		
 		//faces
 		gl.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ebo[0]);	//make face buffer active
@@ -244,11 +242,13 @@ class Renderer implements GLEventListener {
 			this.vertices = object.getVertArray();
 			this.normals = object.getNormArray();
 			this.faces = object.getFacesArray();
+			this.uvs = object.getUVArray();
 			this.numVerts = object.numElements("vertex");
 			this.numFaceIndex = this.faces.length;
 			
 			this.vBuf = Buffers.newDirectFloatBuffer(vertices);
 			this.nBuf = Buffers.newDirectFloatBuffer(normals);
+			this.tBuf = Buffers.newDirectFloatBuffer(uvs);
 			this.fBuf = Buffers.newDirectIntBuffer(faces);
 		
 		} catch (Exception ex) {
