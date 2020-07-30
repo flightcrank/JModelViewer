@@ -42,7 +42,7 @@ class Renderer implements GLEventListener {
 		GL3 gl = glAutoDrawable.getGL().getGL3();
 		
 		//loadModel("test.obj");
-		this.loadMesh("mario.ply");
+		this.loadMesh("cube.ply");
 		
 		rot = 0;
 		
@@ -50,7 +50,7 @@ class Renderer implements GLEventListener {
 
 		try {
 
-			tex = TextureIO.newTexture(new File("dr.mario_di.png"), false);
+			tex = TextureIO.newTexture(new File("TexMap.png"), false);
 			texo = tex.getTextureObject();
 		
 		} catch (Exception e) { 
@@ -124,7 +124,7 @@ class Renderer implements GLEventListener {
 		gl.glUniform3f(lightPos, lx, ly, lz);
 		
 		int modelColour = gl.glGetUniformLocation(renderingProgram, "modelColour");
-		gl.glUniform3f(modelColour, 0.8f, 0.8f, 0.8f);
+		gl.glUniform3f(modelColour, 1.0f, 1.0f, 1.0f);
 
 		int offset = gl.glGetUniformLocation(renderingProgram, "offset");
 		gl.glUniform3f(offset, oy, ox, oz);
